@@ -1,19 +1,42 @@
-- !host helloworld
-- !host consumer
+---
+- !policy
+  id: shared-secret-auth
+  body:
+    - !host helloworld
+    - !group consumers
 
-- !variable helloworld-secret
+    - !variable helloworld-secret
 
-- !permit
-  role: !host helloworld
-  privileges:
-    - read
-    - update
-  resource: !variable helloworld-secret 
+    - !permit
+      role: !host helloworld
+      privileges:
+        - read
+        - update
+      resource: !variable helloworld-secret 
 
-- !permit
-  role: !host consumer
-  privileges:
-    - read
-    - execute
-  resource: !variable helloworld-secret
-  
+    - !permit
+      role: !group consumers
+      privileges:
+        - read
+        - execute
+      resource: !variable helloworld-secret
+
+- !policy
+  id: tomcat
+  body:
+    - !layer hosts
+    - !host-factory
+      layers: [ !layer hosts ]
+
+- !policy
+  id: webapp
+  body:
+    - !layer hosts
+    - !host-factory
+      layers: [ !layer hosts ]
+
+- !grant
+  role: !group shared-secret-auth/consumers
+  members:
+    - !layer tomcat/hosts
+    - !layer webapp/hosts

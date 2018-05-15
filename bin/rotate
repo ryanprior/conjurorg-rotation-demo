@@ -1,0 +1,8 @@
+#!/bin/bash
+
+set -eu
+
+secret="$(docker-compose run --rm --no-deps \
+                         conjur-cli variable value shared-secret-auth/helloworld-secret \
+                         | tr -d \"\r\n\")"
+curl -v -H "Authorization:Token token=\"$secret\"" http://localhost:8080/rotate

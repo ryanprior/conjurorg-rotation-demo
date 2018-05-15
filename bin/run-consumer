@@ -1,9 +1,16 @@
-#!/bin/bash -eu
+#!/bin/bash
 
-consumer_id=${DEMO_CONSUMER_ID:-consumer}
+set -eux
+
+consumer_id=${DEMO_CONSUMER_ID:-tomcat-01}
 
 # Rotate the api key for the consumer to connect to Conjur
-export CONJUR_AUTHN_API_KEY=$(docker-compose run -T conjur-cli \
+token="$(docker-compose run --rm -T --no-deps conjur-cli \
+                        hostfactory tokens create --duration-minutes=5 tomcat \
+                        | jq -r .[].token | tr -d \"\r\n\")"
+docker-compose run --rm -T --no-deps conjur-cli \
+               hostfactory hosts create $token $consumer_id
+export CONJUR_AUTHN_API_KEY=$(docker-compose run -T --no-deps conjur-cli \
     host rotate_api_key --host "$consumer_id" \
     | tr -d "\r\n")
 

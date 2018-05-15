@@ -9,8 +9,8 @@ api_key=$(docker-compose exec conjur conjurctl role \
             retrieve-key "$role_id" | tr -d "\r\n")
 
 # Login as the Conjur Admin and load the demo policy
-docker-compose run --rm conjur-cli \
+docker-compose run --rm --no-deps conjur-cli \
     authn login -u "$conjur_admin" -p $api_key
 
-docker-compose run --rm -T conjur-cli \
+docker-compose run --rm --no-deps -T conjur-cli \
     policy load root /root/policy.yaml

@@ -10,9 +10,9 @@ services:
       - "8080:4567"
     environment: 
       RACK_ENV: DEMO
-      DEMO_SERVICE_KEY_ID: ${DEMO_SERVICE_KEY_ID:-helloworld-secret}
-      CONJUR_AUTHN_LOGIN: host/${DEMO_SERVICE_ID:-helloworld}
-      CONJUR_AUTHN_API_KEY: 
+      DEMO_SERVICE_KEY_ID: ${DEMO_SERVICE_KEY_ID:-shared-secret-auth/helloworld-secret}
+      CONJUR_AUTHN_LOGIN: host/${DEMO_SERVICE_ID:-shared-secret-auth/helloworld}
+      CONJUR_AUTHN_API_KEY:
       CONJUR_APPLIANCE_URL: ${CONJUR_APPLIANCE_URL:-http://conjur}
       CONJUR_ACCOUNT: ${CONJUR_ACCOUNT:-demo}
 
