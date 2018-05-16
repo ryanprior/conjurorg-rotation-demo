@@ -1,0 +1,25 @@
+#!/bin/bash
+
+set -eu
+
+host_prefixes="${DEMO_HOST_PREFIXES:-tomcat webapp}"
+
+declare -a prefixes=($host_prefixes)
+hosts_json='{}'
+
+for prefix in ${prefixes[@]}; do
+    token=$(docker-compose run --rm -T --no-deps conjur-cli \
+                           hostfactory tokens create --duration-days=1 $prefix \
+                | jq -r .[].token | tr -d '\n')
+    echo "Created host factory token for $prefix layer"
+    hosts=("$prefix-"{1..5})
+    for host in ${hosts[@]}; do
+        hosts_json="$(docker-compose run --rm -T --no-deps conjur-cli \
+                       hostfactory hosts create $token $host \
+                       | jq "$hosts_json+{(.id): .api_key}")"
+        echo "Created host: \"$host\""
+    done
+    docker-compose run --rm -T --no-deps conjur-cli \
+                   hostfactory tokens revoke $token
+done
+echo "$hosts_json" | tee hosts.json
