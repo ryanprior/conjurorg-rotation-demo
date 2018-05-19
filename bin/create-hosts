@@ -2,9 +2,7 @@
 
 set -eu
 
-host_prefixes="${DEMO_HOST_PREFIXES:-tomcat webapp}"
-
-declare -a prefixes=($host_prefixes)
+prefixes=("${DEMO_HOST_PREFIXES:-tomcat webapp}")
 hosts_json='{}'
 
 for prefix in ${prefixes[@]}; do

@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -eu
+
+consumers=($(jq -r 'keys | join(" ")' hosts.json))
+while true; do
+    for consumer in ${consumers[@]}; do
+        export CONJUR_AUTHN_LOGIN=host/$(echo "$consumer" | cut -d: -f3 | tr -d \"\\n\")
+        export CONJUR_AUTHN_API_KEY=$(jq -r .\"$consumer\" hosts.json | tr -d \"\\n\")
+        docker-compose run --rm --no-deps consumer $@
+    done
+done

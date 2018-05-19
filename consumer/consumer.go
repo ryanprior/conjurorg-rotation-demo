@@ -26,10 +26,12 @@ func main() {
 		serviceToken = "Invalid Token"
 	} else {
 		var err error
-		serviceToken, err = fetchSecretFromConjur(secretID, conjurLogin, conjurAPIKey)
+		var message string
+		serviceToken, message, err = fetchSecretFromConjur(secretID, conjurLogin, conjurAPIKey)
 
 		if err != nil {
-			panic(err)
+			fmt.Println(conjurLogin, " | ", message)
+			os.Exit(0)
 		}
 	}
 
@@ -40,12 +42,10 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Println("Response from service: ", response)
+	fmt.Println(conjurLogin, " | ", response, " | ", serviceToken)
 }
 
-func fetchSecretFromConjur(secretID string, conjurLogin string, conjurAPIKey string) (string, error) {
-	fmt.Fprintf(os.Stderr, "Connecting to Conjur...\n")
-
+func fetchSecretFromConjur(secretID string, conjurLogin string, conjurAPIKey string) (string, string, error) {
 	// Receive the consumer conjur login and key
 	config := conjurapi.LoadConfig()
 	conjur, err := conjurapi.NewClientFromKey(config,
@@ -56,22 +56,19 @@ func fetchSecretFromConjur(secretID string, conjurLogin string, conjurAPIKey str
 	)
 
 	if err != nil {
-		return "", err
+		return "", "Could not authenticate to Conjur", err
 	}
 
 	// User Conjur login/key to fetch app secret
 	secretValue, err := conjur.RetrieveSecret(secretID)
 	if err != nil {
-		return "", err
+		return "", "Not authorized", err
 	}
 
-	return string(secretValue), nil
+	return string(secretValue), "", nil
 }
 
 func sendRequestToService(serviceURL string, serviceToken string) (string, error) {
-
-	fmt.Fprintf(os.Stderr, "Connecting to %s with token: %s\n", serviceURL, serviceToken)
-
 	client := &http.Client{}
 
 	req, err := http.NewRequest("GET", serviceURL, nil)

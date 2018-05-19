@@ -13,4 +13,4 @@ docker-compose run --rm --no-deps conjur-cli \
     authn login -u "$conjur_admin" -p $api_key
 
 docker-compose run --rm --no-deps -T conjur-cli \
-    policy load root /root/policy.yaml
+    policy load --replace root /root/policy.yaml

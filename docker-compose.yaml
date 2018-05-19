@@ -26,7 +26,7 @@ services:
     environment:       
       DEMO_SERVICE_KEY_ID: ${DEMO_SERVICE_KEY_ID:-shared-secret-auth/helloworld-secret}
       DEMO_SERVICE_URL: http://helloworld:4567
-      CONJUR_AUTHN_LOGIN: host/${DEMO_CONSUMER_ID:-tomcat-01}
+      CONJUR_AUTHN_LOGIN:
       CONJUR_AUTHN_API_KEY: 
       CONJUR_APPLIANCE_URL: ${CONJUR_APPLIANCE_URL:-http://conjur}
       CONJUR_ACCOUNT: ${CONJUR_ACCOUNT:-demo}
